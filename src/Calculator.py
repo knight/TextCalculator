@@ -12,7 +12,13 @@ class Node(object):
             return Node(0)
         else:
             return Node(int(s))
-
+class CompositeNode(object):
+    def __init__(self):
+        self.value = 0
+        self.parent = None
+        self.node = None
+    def evaluate(self):
+        return self.node.evaluate()
 class OperatorFactory(object):
     def __init__(self):
         pass
@@ -30,7 +36,12 @@ class OperatorFactory(object):
         match = re.search("[-+\*\/]", s)
         if (hasattr(match, 'group')):
             return match.group(0)
-        
+    def getPriority(self, op):
+        if op == "+":
+            return 1
+        elif op == "-":
+            return 2
+        return 3
 class Calculator(object):
 
     def __init__(self, lvalue=0, rvalue=0):
@@ -47,6 +58,7 @@ class Calculator(object):
         s = s.strip()
         if 0 == len(s):
             return
+        last = 0
         if s[0]=="(":
             last = string.rfind(s,")")
             return self.input(s[0+1:last] + s[last+1:])
@@ -54,10 +66,11 @@ class Calculator(object):
         
         if op is not None:
             self.evaluator = self.operators.getOperation(op)
-            self.setLeftLeaf(Node.input(s[ : s.index(op)]))
+            self.operator_priority = self.operators.getPriority(op)
+            self.setLeftLeaf(Node.input(s[last : s.index(op)]))
             self.createCalcNode(s[s.index(op) + 1:])
 
-            if self.parent is not None and op in ['+', '-']:
+            if self.parent is not None:
                 self.swapBranches()
         else:
             self.setLeftLeaf(Node.input(s))
@@ -88,6 +101,8 @@ class Calculator(object):
         return rvalue
 
     def swapBranches(self):
+        if self.parent.operator_priority <= self.operator_priority:
+            return
         self.swapEvaluator()
         self.parent.swapLeaves()
         p_rvalue = self.parent.rvalue

@@ -109,7 +109,7 @@ class CalculatorTest(unittest.TestCase):
         sut.input("3+2-2")
         rvalue = sut.rvalue
         rvalue.swapEvaluator()
-        self.assertEqual(4,sut.evaluator(2,2))
+        self.assertEqual(0,sut.evaluator(2,2))
         
         
     def testShouldNotSwapEvaluatorIfRootNode(self):
@@ -148,16 +148,27 @@ class CalculatorTest(unittest.TestCase):
         sut = self.sut
         sut.input("(2-1)+3")
         self.assertEqual(4, sut.evaluate())
+    def testCanEvaluateCompoundExpressionEvenIfParanthesisAreTheFirstMultiplicationVersion(self):
+        sut = self.sut
+        sut.input("(2-1)*3")
+        self.assertEqual(3, sut.evaluate())
     def testCanEvaluateVeryCompoundExpressionsEvenIfParanthesisAreInvolved(self):
         sut = self.sut
         sut.input("((2-1)*2)-2")
         self.assertEqual(-1, sut.evaluate())
+    def testCanEvaluateTwoMultiplicationsSeparatedByAdditions(self):
+        sut = self.sut
+        sut.input("2*3+2+3+3*2")
+        self.assertEqual(17, sut.evaluate())
+    def testSingleExpressionInParanthesisShouldBecomeLeftNode(self):
+        self.sut.input("(2+3)")
+        self.assertEqual(0, self.sut.rvalue.evaluate())
     
 class OperatorFactoryTest(unittest.TestCase):
     def setUp(self):
-        pass
+        self.sut = Calculator.OperatorFactory()
     def tearDown(self):
-        pass
+        del self.sut
     def testPlusShouldStandForAddition(self):
         sut = Calculator.OperatorFactory()
         func = sut.getOperation('+')
@@ -170,6 +181,14 @@ class OperatorFactoryTest(unittest.TestCase):
         sut = Calculator.OperatorFactory()
         op = sut.findOperation('')
         self.assertTrue(op is None)
+    def testAdditionShouldHaveLowestPriority(self):
+        self.assertEqual(1,self.sut.getPriority('+'))
+    def testSubstractionBindBitTighter(self):
+        self.assertEqual(2,self.sut.getPriority('-'))
+    def testMultiplicationHaveHigherPriorityThanAddition(self):
+        self.assertTrue(self.sut.getPriority("+") < self.sut.getPriority("*"))
+    def testSubstractionHasTheSamePriorityAsAddition(self):
+        self.assertTrue(self.sut.getPriority("+") < self.sut.getPriority("-"))
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testShouldParseInput']
