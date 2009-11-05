@@ -155,7 +155,7 @@ class CalculatorTest(unittest.TestCase):
     def testCanEvaluateVeryCompoundExpressionsEvenIfParanthesisAreInvolved(self):
         sut = self.sut
         sut.input("((2-1)*2)-2")
-        self.assertEqual(-1, sut.evaluate())
+        self.assertEqual(0, sut.evaluate())
     def testCanEvaluateTwoMultiplicationsSeparatedByAdditions(self):
         sut = self.sut
         sut.input("2*3+2+3+3*2")
@@ -181,6 +181,15 @@ class OperatorFactoryTest(unittest.TestCase):
         sut = Calculator.OperatorFactory()
         op = sut.findOperation('')
         self.assertTrue(op is None)
+    def testShouldIgnoreParanthesisWhenSearchingForOperator(self):
+        self.assertEqual("+", self.sut.findOperation("(2-2)+10"))
+    def testShouldFindOperatorBetweenTwoBraces(self):
+        self.assertEqual("+", self.sut.findOperation("((2-2)*2)+(2-2)"))
+    def testShouldIndicatePositionOfOperatorFound(self):
+        self.sut.findOperation("((2-2)*2)+(2-2)")
+        self.assertEqual(9,self.sut.operatorIndex())
+    def testShouldNotFindAnyOperator(self):
+        self.assertTrue(self.sut.findOperation("(2+2)") is None)
     def testAdditionShouldHaveLowestPriority(self):
         self.assertEqual(1,self.sut.getPriority('+'))
     def testSubstractionBindBitTighter(self):

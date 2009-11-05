@@ -10,18 +10,26 @@ class Node(object):
     def input(s):
         if len(s)==0:
             return Node(0)
+        elif s[0]=="(":
+            c = CompositeNode()
+            calc = Calculator()
+            calc.operators = OperatorFactory()
+            calc.input(s[1 : string.rfind(s, ')')])
+            
+            c.node = calc
+            
+            return c
         else:
             return Node(int(s))
 class CompositeNode(object):
     def __init__(self):
-        self.value = 0
         self.parent = None
         self.node = None
     def evaluate(self):
         return self.node.evaluate()
 class OperatorFactory(object):
     def __init__(self):
-        pass
+        self.index = 0
     def getOperation(self, s):
         mnemonic = self.findOperation(s)
         if mnemonic == '+':
@@ -33,9 +41,19 @@ class OperatorFactory(object):
         elif mnemonic == '/':
             return lambda l, r: l/r
     def findOperation(self, s):
-        match = re.search("[-+\*\/]", s)
-        if (hasattr(match, 'group')):
-            return match.group(0)
+        stack = 0
+        for i in range(len(s)):
+            if s[i] == "(":
+                stack +=1
+            elif s[i] == ")":
+                stack -=1
+            else:
+                match = re.search("[-+\*\/]", s[i])
+                if hasattr(match, 'group') and stack==0:
+                    self.index = i
+                    return match.group(0)
+    def operatorIndex(self):
+        return self.index
     def getPriority(self, op):
         if op == "+":
             return 1
@@ -58,17 +76,14 @@ class Calculator(object):
         s = s.strip()
         if 0 == len(s):
             return
-        last = 0
-        if s[0]=="(":
-            last = string.rfind(s,")")
-            return self.input(s[0+1:last] + s[last+1:])
         op = self.operators.findOperation(s)
+        closing = self.operators.operatorIndex()
         
         if op is not None:
             self.evaluator = self.operators.getOperation(op)
             self.operator_priority = self.operators.getPriority(op)
-            self.setLeftLeaf(Node.input(s[last : s.index(op)]))
-            self.createCalcNode(s[s.index(op) + 1:])
+            self.setLeftLeaf(Node.input(s[:closing]))
+            self.createCalcNode(s[closing + 1:])
 
             if self.parent is not None:
                 self.swapBranches()
