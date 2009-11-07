@@ -27,39 +27,7 @@ class CompositeNode(object):
         self.node = None
     def evaluate(self):
         return self.node.evaluate()
-class OperatorFactory(object):
-    def __init__(self):
-        self.index = 0
-    def getOperation(self, s):
-        mnemonic = self.findOperation(s)
-        if mnemonic == '+':
-            return lambda l, r: l+r
-        elif mnemonic == '-':
-            return lambda l, r: l-r
-        elif mnemonic == '*':
-            return lambda l, r: l*r
-        elif mnemonic == '/':
-            return lambda l, r: l/r
-    def findOperation(self, s):
-        stack = 0
-        for i in range(len(s)):
-            if s[i] == "(":
-                stack +=1
-            elif s[i] == ")":
-                stack -=1
-            else:
-                match = re.search("[-+\*\/]", s[i])
-                if hasattr(match, 'group') and stack==0:
-                    self.index = i
-                    return match.group(0)
-    def operatorIndex(self):
-        return self.index
-    def getPriority(self, op):
-        if op == "+":
-            return 1
-        elif op == "-":
-            return 2
-        return 3
+
 class Calculator(object):
 
     def __init__(self, lvalue=0, rvalue=0):
@@ -109,11 +77,11 @@ class Calculator(object):
         self.rvalue.parent = self
 
     def createCalcNode(self, s):
-        rvalue = Calculator()
-        rvalue.operators = self.operators
-        self.setRightLeaf(rvalue)
-        rvalue.input(s)
-        return rvalue
+        node = Calculator()
+        node.operators = self.operators
+        self.setRightLeaf(node)
+        node.input(s)
+        return node
 
     def swapBranches(self):
         if self.parent.operator_priority <= self.operator_priority:
@@ -124,4 +92,37 @@ class Calculator(object):
         self.parent.setRightLeaf(self.rvalue)
         self.setRightLeaf(p_rvalue)
         self.swapLeaves()
-
+      
+class OperatorFactory(object):
+    def __init__(self):
+        self.index = 0
+    def getOperation(self, s):
+        mnemonic = self.findOperation(s)
+        if mnemonic == '+':
+            return lambda l, r: l+r
+        elif mnemonic == '-':
+            return lambda l, r: l-r
+        elif mnemonic == '*':
+            return lambda l, r: l*r
+        elif mnemonic == '/':
+            return lambda l, r: l/r
+    def findOperation(self, s):
+        stack = 0
+        for i in range(len(s)):
+            if s[i] == "(":
+                stack +=1
+            elif s[i] == ")":
+                stack -=1
+            else:
+                match = re.search("[-+\*\/]", s[i])
+                if hasattr(match, 'group') and stack==0:
+                    self.index = i
+                    return match.group(0)
+    def operatorIndex(self):
+        return self.index
+    def getPriority(self, op):
+        if op == "+":
+            return 1
+        elif op == "-":
+            return 2
+        return 3
