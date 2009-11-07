@@ -24,6 +24,8 @@ class Node(object):
         self.operators = OperatorFactory()
         self.evaluator = self.operators.getOperation('+')
         self.parent = None
+    def evaluate(self):
+        return self.evaluator(self.lvalue.evaluate(), self.rvalue.evaluate())
 
     def input(self, s):
         s = s.strip()
@@ -44,17 +46,7 @@ class Node(object):
         else:
             self.setLeftLeaf(node_factory.input(s))
 
-    def evaluate(self):
-        return self.evaluator(self.lvalue.evaluate(), self.rvalue.evaluate())
-    def swapLeaves(self):
-        node = self.rvalue
-        self.rvalue = self.lvalue
-        self.lvalue = node
-    def swapEvaluator(self):
-        if self.parent is not None:
-            evaluator = self.evaluator
-            self.evaluator = self.parent.evaluator
-            self.parent.evaluator = evaluator
+
     def setLeftLeaf(self, node):
         self.lvalue = node
         self.lvalue.parent = self
@@ -77,7 +69,16 @@ class Node(object):
         self.parent.setRightLeaf(self.rvalue)
         self.setRightLeaf(p_rvalue)
         self.swapLeaves()
-      
+    def swapEvaluator(self):
+        if self.parent is not None:
+            evaluator = self.evaluator
+            self.evaluator = self.parent.evaluator
+            self.parent.evaluator = evaluator
+    def swapLeaves(self):
+        node = self.rvalue
+        self.rvalue = self.lvalue
+        self.lvalue = node
+                  
 class OperatorFactory(object):
     def __init__(self):
         self.index = 0
