@@ -6,21 +6,6 @@ class Node(object):
         self.parent = None
     def evaluate(self):
         return self.value
-    @staticmethod
-    def input(s):
-        if len(s)==0:
-            return Node(0)
-        elif s[0]=="(":
-            c = CompositeNode()
-            calc = Calculator()
-            calc.operators = OperatorFactory()
-            calc.input(s[1 : string.rfind(s, ')')])
-            
-            c.node = calc
-            
-            return c
-        else:
-            return Node(int(s))
 class CompositeNode(object):
     def __init__(self):
         self.parent = None
@@ -47,16 +32,17 @@ class Calculator(object):
         op = self.operators.findOperation(s)
         closing = self.operators.operatorIndex()
         
+        node_factory = NodeFactory()
         if op is not None:
             self.evaluator = self.operators.getOperation(op)
             self.operator_priority = self.operators.getPriority(op)
-            self.setLeftLeaf(Node.input(s[:closing]))
+            self.setLeftLeaf(node_factory.input(s[:closing]))
             self.createCalcNode(s[closing + 1:])
 
             if self.parent is not None:
                 self.swapBranches()
         else:
-            self.setLeftLeaf(Node.input(s))
+            self.setLeftLeaf(node_factory.input(s))
 
     def evaluate(self):
         return self.evaluator(self.lvalue.evaluate(), self.rvalue.evaluate())
@@ -127,5 +113,17 @@ class OperatorFactory(object):
             return 2
         return 3
 class NodeFactory(object):
-    def createNode(self, s):
-        return Node(0)
+    def input(self, s):
+        if len(s)==0:
+            return Node(0)
+        elif s[0]=="(":
+            c = CompositeNode()
+            calc = Calculator()
+            calc.operators = OperatorFactory()
+            calc.input(s[1 : string.rfind(s, ')')])
+            
+            c.node = calc
+            
+            return c
+        else:
+            return Node(int(s))

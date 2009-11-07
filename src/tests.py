@@ -129,9 +129,6 @@ class CalculatorTest(unittest.TestCase):
         sut = self.sut
         sut.input("-1")
         self.assertEqual(-1, sut.evaluate())
-    def testParsingEmptyStringShouldCreateZeroNode(self):
-        sut = Calculator.Node.input("")
-        self.assertEqual(0, sut.evaluate())
     def testCanEvaluateExpressionsInParanthesis(self):
         sut = self.sut
         sut.input("(2+2)")
@@ -205,7 +202,10 @@ class NodeFactoryTest(unittest.TestCase):
     def tearDown(self):
         pass
     def testNodeFactoryShouldCreateNodeFromString(self):
-        self.assertTrue(hasattr(self.sut.createNode(""), 'evaluate'))
+        self.assertTrue(hasattr(self.sut.input(""), 'evaluate'))
+    def testSimpleNodeShouldHaveTheValueParsed(self):
+        node = self.sut.input("5")
+        self.assertEqual(5, node.evaluate())
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testShouldParseInput']
     unittest.main()
