@@ -21,8 +21,8 @@ class Node(object):
         '''
         self.setLeftLeaf(Leaf(lvalue))
         self.setRightLeaf(Leaf(rvalue))
-
-        self.evaluator = lambda left,right: left  + right
+        self.operators = OperatorFactory()
+        self.evaluator = self.operators.getOperation('+')
         self.parent = None
 
     def input(self, s):
@@ -64,7 +64,6 @@ class Node(object):
 
     def createCalcNode(self, s):
         node = Node()
-        node.operators = self.operators
         self.setRightLeaf(node)
         node.input(s)
         return node
