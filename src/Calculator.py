@@ -1,6 +1,6 @@
 import re
 import string
-class Node(object):
+class Leaf(object):
     def __init__(self, value):
         self.value = value
         self.parent = None
@@ -13,14 +13,14 @@ class CompositeNode(object):
     def evaluate(self):
         return self.node.evaluate()
 
-class Calculator(object):
+class Node(object):
 
     def __init__(self, lvalue=0, rvalue=0):
         '''
         Constructor
         '''
-        self.setLeftLeaf(Node(lvalue))
-        self.setRightLeaf(Node(rvalue))
+        self.setLeftLeaf(Leaf(lvalue))
+        self.setRightLeaf(Leaf(rvalue))
 
         self.evaluator = lambda left,right: left  + right
         self.parent = None
@@ -63,7 +63,7 @@ class Calculator(object):
         self.rvalue.parent = self
 
     def createCalcNode(self, s):
-        node = Calculator()
+        node = Node()
         node.operators = self.operators
         self.setRightLeaf(node)
         node.input(s)
@@ -115,10 +115,10 @@ class OperatorFactory(object):
 class NodeFactory(object):
     def input(self, s):
         if len(s)==0:
-            return Node(0)
+            return Leaf(0)
         elif s[0]=="(":
             c = CompositeNode()
-            calc = Calculator()
+            calc = Node()
             calc.operators = OperatorFactory()
             calc.input(s[1 : string.rfind(s, ')')])
             
@@ -126,4 +126,4 @@ class NodeFactory(object):
             
             return c
         else:
-            return Node(int(s))
+            return Leaf(int(s))

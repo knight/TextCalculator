@@ -6,7 +6,7 @@ class CalculatorTest(unittest.TestCase):
 
 
     def setUp(self):
-        self.sut = Calculator.Calculator()
+        self.sut = Calculator.Node()
         self.sut.operators = Calculator.OperatorFactory()
 
     def tearDown(self):
@@ -99,8 +99,8 @@ class CalculatorTest(unittest.TestCase):
         self.assertEquals(sut, rnode.parent)
     def testCalulatorShouldBeAbleToSwapItsLeaves(self):
         sut = self.sut
-        sut.setLeftLeaf(Calculator.Node(3))
-        sut.setRightLeaf(Calculator.Node(2))
+        sut.setLeftLeaf(Calculator.Leaf(3))
+        sut.setRightLeaf(Calculator.Leaf(2))
         sut.swapLeaves()
         self.assertEquals(3, sut.rvalue.evaluate())
         self.assertEquals(2, sut.lvalue.evaluate())
