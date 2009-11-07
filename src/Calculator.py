@@ -126,3 +126,6 @@ class OperatorFactory(object):
         elif op == "-":
             return 2
         return 3
+class NodeFactory(object):
+    def createNode(self, s):
+        return Node(0)

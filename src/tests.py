@@ -198,7 +198,14 @@ class OperatorFactoryTest(unittest.TestCase):
         self.assertTrue(self.sut.getPriority("+") < self.sut.getPriority("*"))
     def testSubstractionHasTheSamePriorityAsAddition(self):
         self.assertTrue(self.sut.getPriority("+") < self.sut.getPriority("-"))
-
+        
+class NodeFactoryTest(unittest.TestCase):
+    def setUp(self):
+        self.sut = Calculator.NodeFactory()
+    def tearDown(self):
+        pass
+    def testNodeFactoryShouldCreateNodeFromString(self):
+        self.assertTrue(hasattr(self.sut.createNode(""), 'evaluate'))
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testShouldParseInput']
     unittest.main()
