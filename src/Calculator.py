@@ -64,20 +64,26 @@ class Node(object):
         if self.parent.operator_priority <= self.operator_priority:
             return
         self.swapEvaluator()
-        self.parent.swapLeaves()
-        p_rvalue = self.parent.rvalue
-        self.parent.setRightLeaf(self.rvalue)
-        self.setRightLeaf(p_rvalue)
+        self.swapParentsLeaves()
+        self.exchangeRightLeafWithParent()
         self.swapLeaves()
+        
     def swapEvaluator(self):
         if self.parent is not None:
             evaluator = self.evaluator
             self.evaluator = self.parent.evaluator
             self.parent.evaluator = evaluator
+    def swapParentsLeaves(self):
+        self.parent.swapLeaves()
     def swapLeaves(self):
         node = self.rvalue
         self.rvalue = self.lvalue
-        self.lvalue = node
+        self.lvalue = node            
+    def exchangeRightLeafWithParent(self):
+        p_rvalue = self.parent.rvalue
+        self.parent.setRightLeaf(self.rvalue)
+        self.setRightLeaf(p_rvalue)
+
                   
 class OperatorFactory(object):
     def __init__(self):
