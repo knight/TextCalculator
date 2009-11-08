@@ -102,6 +102,8 @@ class OperatorFactory(object):
             return 2
         return 3
 class NodeFactory(object):
+    def __init__(self):
+        self.operator_factory = OperatorFactory()
     def input(self, s):
         s = s.strip()
         if len(s)==0:
@@ -113,19 +115,18 @@ class NodeFactory(object):
     def parseCompositeNode(self, s):
         composite = CompositeNode()
         node = Node()
-        node.operators = OperatorFactory()
-        node.input(s)
-        composite.node = node
+        composite.node = self.parseNode(s, node)
         return composite
     def parseNode(self, s, node):
         s = s.strip()
         if 0 == len(s):
             return node
-        op = node.operators.findOperation(s)
-        op_index = node.operators.operatorIndex()
+        op = self.operator_factory.findOperation(s)
+        op_index = self.operator_factory.operatorIndex()
+        
         if op is not None:
-            node.evaluator = node.operators.getOperation(op)
-            node.operator_priority = node.operators.getPriority(op)
+            node.evaluator = self.operator_factory.getOperation(op)
+            node.operator_priority = self.operator_factory.getPriority(op)
             node.setLeftLeaf(self.input(s[:op_index]))
             self.parseRightNode(s[op_index+1 : ], node)
             if node.isBranchSwapNecessary():
