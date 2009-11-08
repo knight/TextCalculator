@@ -32,16 +32,15 @@ class Node(object):
         if 0 == len(s):
             return
         op = self.operators.findOperation(s)
-        closing = self.operators.operatorIndex()
+        op_index = self.operators.operatorIndex()
         
         node_factory = NodeFactory()
         if op is not None:
             self.evaluator = self.operators.getOperation(op)
             self.operator_priority = self.operators.getPriority(op)
-            self.setLeftLeaf(node_factory.input(s[:closing]))
-            self.createCalcNode(s[closing + 1:])
-
-            if self.parent is not None:
+            self.setLeftLeaf(node_factory.input(s[:op_index]))
+            self.createCalcNode(s[op_index + 1:])
+            if self.isBranchSwapNecessary():
                 self.swapBranches()
         else:
             self.setLeftLeaf(node_factory.input(s))
@@ -61,13 +60,16 @@ class Node(object):
         return node
 
     def swapBranches(self):
-        if self.parent.operator_priority <= self.operator_priority:
-            return
         self.swapEvaluator()
         self.swapParentsLeaves()
         self.exchangeRightLeafWithParent()
         self.swapLeaves()
-        
+    def isBranchSwapNecessary(self):
+        if self.parent is None:
+            return False
+        if self.parent.operator_priority <= self.operator_priority:
+            return False
+        return True        
     def swapEvaluator(self):
         if self.parent is not None:
             evaluator = self.evaluator
