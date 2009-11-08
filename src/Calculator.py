@@ -126,12 +126,12 @@ class NodeFactory(object):
         else:
             return Leaf(int(s))
     def parseCompositeNode(self, s):
-        node = CompositeNode()
-        calc = Node()
-        calc.operators = OperatorFactory()
-        calc.input(s)
-        node.node = calc
-        return node
+        composite = CompositeNode()
+        node = Node()
+        node.operators = OperatorFactory()
+        node.input(s)
+        composite.node = node
+        return composite
     def parseNode(self, s, parent):
         node = Node()
         parent.setRightLeaf(node)
