@@ -136,5 +136,5 @@ class NodeFactory(object):
     def parseRightNode(self, s, parent):
         node = Node()
         parent.setRightLeaf(node)
-        node.input(s)
+        self.parseNode(s, node)
         return node
