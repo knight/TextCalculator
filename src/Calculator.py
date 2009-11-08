@@ -23,6 +23,7 @@ class Node(object):
         self.setRightLeaf(Leaf(rvalue))
         self.operators = OperatorFactory()
         self.evaluator = self.operators.getOperation('+')
+        self.operator_priority = self.operators.getPriority('+')
         self.parent = None
     def evaluate(self):
         return self.evaluator(self.lvalue.evaluate(), self.rvalue.evaluate())
@@ -39,7 +40,7 @@ class Node(object):
             self.evaluator = self.operators.getOperation(op)
             self.operator_priority = self.operators.getPriority(op)
             self.setLeftLeaf(node_factory.input(s[:op_index]))
-            self.createCalcNode(s[op_index + 1:])
+            node_factory.parseNode(s[op_index+1 : ], self)
             if self.isBranchSwapNecessary():
                 self.swapBranches()
         else:
@@ -52,12 +53,6 @@ class Node(object):
     def setRightLeaf(self, node):
         self.rvalue = node
         self.rvalue.parent = self
-
-    def createCalcNode(self, s):
-        node = Node()
-        self.setRightLeaf(node)
-        node.input(s)
-        return node
 
     def swapBranches(self):
         self.swapEvaluator()
@@ -89,7 +84,7 @@ class Node(object):
                   
 class OperatorFactory(object):
     def __init__(self):
-        self.index = 0
+        self.index = None
     def getOperation(self, s):
         mnemonic = self.findOperation(s)
         if mnemonic == '+':
@@ -112,6 +107,7 @@ class OperatorFactory(object):
                 if hasattr(match, 'group') and stack==0:
                     self.index = i
                     return match.group(0)
+        
     def operatorIndex(self):
         return self.index
     def getPriority(self, op):
@@ -126,13 +122,18 @@ class NodeFactory(object):
         if len(s)==0:
             return Leaf(0)
         if s[0]=="(":
-            c = CompositeNode()
-            calc = Node()
-            calc.operators = OperatorFactory()
-            calc.input(s[1 : string.rfind(s, ')')])
-            
-            c.node = calc
-            
-            return c
+            return self.parseCompositeNode(s[1:string.rfind(s, ')')])
         else:
             return Leaf(int(s))
+    def parseCompositeNode(self, s):
+        node = CompositeNode()
+        calc = Node()
+        calc.operators = OperatorFactory()
+        calc.input(s)
+        node.node = calc
+        return node
+    def parseNode(self, s, parent):
+        node = Node()
+        parent.setRightLeaf(node)
+        node.input(s)
+        return node

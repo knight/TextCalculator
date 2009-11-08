@@ -178,6 +178,9 @@ class OperatorFactoryTest(unittest.TestCase):
         sut = Calculator.OperatorFactory()
         op = sut.findOperation('')
         self.assertTrue(op is None)
+    def testReturnedIndexShouldBeNoneIfOperatorNotFound(self):
+        self.sut.findOperation('0123')
+        self.assertEquals(None, self.sut.operatorIndex())
     def testShouldIgnoreParanthesisWhenSearchingForOperator(self):
         self.assertEqual("+", self.sut.findOperation("(2-2)+10"))
     def testShouldFindOperatorBetweenTwoBraces(self):
