@@ -29,23 +29,8 @@ class Node(object):
         return self.evaluator(self.lvalue.evaluate(), self.rvalue.evaluate())
 
     def input(self, s):
-        s = s.strip()
-        if 0 == len(s):
-            return
-        op = self.operators.findOperation(s)
-        op_index = self.operators.operatorIndex()
-        
         node_factory = NodeFactory()
-        if op is not None:
-            self.evaluator = self.operators.getOperation(op)
-            self.operator_priority = self.operators.getPriority(op)
-            self.setLeftLeaf(node_factory.input(s[:op_index]))
-            node_factory.parseNode(s[op_index+1 : ], self)
-            if self.isBranchSwapNecessary():
-                self.swapBranches()
-        else:
-            self.setLeftLeaf(node_factory.input(s))
-
+        return node_factory.parseNode(s, self)
 
     def setLeftLeaf(self, node):
         self.lvalue = node
@@ -132,7 +117,23 @@ class NodeFactory(object):
         node.input(s)
         composite.node = node
         return composite
-    def parseNode(self, s, parent):
+    def parseNode(self, s, node):
+        s = s.strip()
+        if 0 == len(s):
+            return node
+        op = node.operators.findOperation(s)
+        op_index = node.operators.operatorIndex()
+        if op is not None:
+            node.evaluator = node.operators.getOperation(op)
+            node.operator_priority = node.operators.getPriority(op)
+            node.setLeftLeaf(self.input(s[:op_index]))
+            self.parseRightNode(s[op_index+1 : ], node)
+            if node.isBranchSwapNecessary():
+                node.swapBranches()
+        else:
+            node.setLeftLeaf(self.input(s))        
+        return node
+    def parseRightNode(self, s, parent):
         node = Node()
         parent.setRightLeaf(node)
         node.input(s)
