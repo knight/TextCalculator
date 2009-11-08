@@ -120,9 +120,10 @@ class OperatorFactory(object):
         return 3
 class NodeFactory(object):
     def input(self, s):
+        s = s.strip()
         if len(s)==0:
             return Leaf(0)
-        elif s[0]=="(":
+        if s[0]=="(":
             c = CompositeNode()
             calc = Node()
             calc.operators = OperatorFactory()

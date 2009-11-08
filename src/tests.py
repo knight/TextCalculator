@@ -206,6 +206,9 @@ class NodeFactoryTest(unittest.TestCase):
     def testSimpleNodeShouldHaveTheValueParsed(self):
         node = self.sut.input("5")
         self.assertEqual(5, node.evaluate())
+    def testSimpleNodeInBracketsShouldBeParsed(self):
+        node = self.sut.input(" (5)")
+        self.assertTrue(5, node.evaluate())
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testShouldParseInput']
     unittest.main()
