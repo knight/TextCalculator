@@ -26,18 +26,18 @@ class Node(object):
         self.operator_priority = self.operators.getPriority('+')
         self.parent = None
     def evaluate(self):
-        return self.evaluator(self.lvalue.evaluate(), self.rvalue.evaluate())
+        return self.evaluator(self.lnode.evaluate(), self.rnode.evaluate())
 
     def input(self, s):
         node_factory = NodeFactory()
         return node_factory.parseNode(s, self)
 
     def setLeftLeaf(self, node):
-        self.lvalue = node
-        self.lvalue.parent = self
+        self.lnode = node
+        self.lnode.parent = self
     def setRightLeaf(self, node):
-        self.rvalue = node
-        self.rvalue.parent = self
+        self.rnode = node
+        self.rnode.parent = self
 
     def swapBranches(self):
         self.swapEvaluator()
@@ -58,12 +58,12 @@ class Node(object):
     def swapParentsLeaves(self):
         self.parent.swapLeaves()
     def swapLeaves(self):
-        node = self.rvalue
-        self.rvalue = self.lvalue
-        self.lvalue = node            
+        node = self.rnode
+        self.rnode = self.lnode
+        self.lnode = node            
     def exchangeRightLeafWithParent(self):
-        p_rvalue = self.parent.rvalue
-        self.parent.setRightLeaf(self.rvalue)
+        p_rvalue = self.parent.rnode
+        self.parent.setRightLeaf(self.rnode)
         self.setRightLeaf(p_rvalue)
 
                   

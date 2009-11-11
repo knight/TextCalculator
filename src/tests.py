@@ -76,12 +76,12 @@ class CalculatorTest(unittest.TestCase):
         self.assertTrue(sut.parent is None)
     def testLeavesShouldHaveParentFieldInitialized(self):
         sut = self.sut
-        lnode = self.sut.lvalue
+        lnode = self.sut.lnode
         self.assertEquals(sut, lnode.parent)
     def testOperationShouldImposeParentChildRelationship(self):
         sut = self.sut
         sut.input("2*5")
-        lnode = sut.lvalue
+        lnode = sut.lnode
         self.assertEquals(sut, lnode.parent)
     def testOperationOnMultiDigit(self):
         sut = self.sut
@@ -90,24 +90,24 @@ class CalculatorTest(unittest.TestCase):
     def testEvenleavesOfTheSimplestExpressionShouldHaveParentInitialized(self):
         sut = self.sut
         sut.input("5")
-        lnode = sut.lvalue
+        lnode = sut.lnode
         self.assertEquals(sut, lnode.parent)
     def testRightSideOfTheExpressionShouldAlsoHaveParentInitialized(self):
         sut = self.sut
         sut.input("5+5")
-        rnode = sut.rvalue
+        rnode = sut.rnode
         self.assertEquals(sut, rnode.parent)
     def testCalulatorShouldBeAbleToSwapItsLeaves(self):
         sut = self.sut
         sut.setLeftLeaf(Calculator.Leaf(3))
         sut.setRightLeaf(Calculator.Leaf(2))
         sut.swapLeaves()
-        self.assertEquals(3, sut.rvalue.evaluate())
-        self.assertEquals(2, sut.lvalue.evaluate())
+        self.assertEquals(3, sut.rnode.evaluate())
+        self.assertEquals(2, sut.lnode.evaluate())
     def testShouldBeAbleToSwapOperationsWithItsParent(self):
         sut = self.sut
         sut.input("3+2-2")
-        rvalue = sut.rvalue
+        rvalue = sut.rnode
         rvalue.swapEvaluator()
         self.assertEqual(0,sut.evaluator(2,2))
         
@@ -159,7 +159,7 @@ class CalculatorTest(unittest.TestCase):
         self.assertEqual(17, sut.evaluate())
     def testSingleExpressionInParanthesisShouldBecomeLeftNode(self):
         self.sut.input("(2+3)")
-        self.assertEqual(0, self.sut.rvalue.evaluate())
+        self.assertEqual(0, self.sut.rnode.evaluate())
     
 class OperatorFactoryTest(unittest.TestCase):
     def setUp(self):
