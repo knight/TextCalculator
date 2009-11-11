@@ -39,34 +39,6 @@ class Node(object):
         self.rnode = node
         self.rnode.parent = self
 
-    def swapBranches(self):
-        self.swapEvaluator()
-        self.swapParentsLeaves()
-        self.exchangeRightLeafWithParent()
-        self.swapLeaves()
-    def isBranchSwapNecessary(self):
-        if self.parent is None:
-            return False
-        if self.parent.operator_priority <= self.operator_priority:
-            return False
-        return True        
-    def swapEvaluator(self):
-        if self.parent is not None:
-            evaluator = self.evaluator
-            self.evaluator = self.parent.evaluator
-            self.parent.evaluator = evaluator
-    def swapParentsLeaves(self):
-        self.parent.swapLeaves()
-    def swapLeaves(self):
-        node = self.rnode
-        self.rnode = self.lnode
-        self.lnode = node            
-    def exchangeRightLeafWithParent(self):
-        p_rvalue = self.parent.rnode
-        self.parent.setRightLeaf(self.rnode)
-        self.setRightLeaf(p_rvalue)
-
-                  
 class OperatorFactory(object):
     def __init__(self):
         self.index = None
@@ -136,6 +108,32 @@ class NodeFactory(object):
         node = Node()
         parent.setRightLeaf(node)
         self.parseNode(s, node)
-        if parent.isBranchSwapNecessary():
-            parent.swapBranches()        
+        if self.isBranchSwapNecessary(parent):
+            self.swapBranches(parent)       
         return node
+    def isBranchSwapNecessary(self, node):
+        if node.parent is None:
+            return False
+        if node.parent.operator_priority <= node.operator_priority:
+            return False
+        return True
+    def swapBranches(self, node):
+        self.swapEvaluator(node)
+        self.swapParentsLeaves(node)
+        self.exchangeRightLeafWithParent(node)
+        self.swapLeaves(node)
+    def swapEvaluator(self, node):
+        if node.parent is not None:
+            evaluator = node.evaluator
+            node.evaluator = node.parent.evaluator
+            node.parent.evaluator = evaluator
+    def swapLeaves(self, node):
+        n = node.rnode
+        node.rnode = node.lnode
+        node.lnode = n              
+    def swapParentsLeaves(self, node):
+        self.swapLeaves(node.parent)
+    def exchangeRightLeafWithParent(self, node):
+        p_rvalue = node.parent.rnode
+        node.parent.setRightLeaf(node.rnode)
+        node.setRightLeaf(p_rvalue)

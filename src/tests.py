@@ -10,7 +10,7 @@ class CalculatorTest(unittest.TestCase):
         self.sut.operators = Calculator.OperatorFactory()
 
     def tearDown(self):
-        pass
+        del self.sut
 
     def testShouldParseInput(self):
         sut = self.sut
@@ -101,22 +101,14 @@ class CalculatorTest(unittest.TestCase):
         sut = self.sut
         sut.setLeftLeaf(Calculator.Leaf(3))
         sut.setRightLeaf(Calculator.Leaf(2))
-        sut.swapLeaves()
+        factory = Calculator.NodeFactory()
+        factory.swapLeaves(sut)
         self.assertEquals(3, sut.rnode.evaluate())
         self.assertEquals(2, sut.lnode.evaluate())
-    def testShouldBeAbleToSwapOperationsWithItsParent(self):
-        sut = self.sut
-        sut.input("3+2-2")
-        rvalue = sut.rnode
-        rvalue.swapEvaluator()
-        self.assertEqual(0,sut.evaluator(2,2))
+
         
         
-    def testShouldNotSwapEvaluatorIfRootNode(self):
-        sut = self.sut
-        sut.input("3+2")
-        sut.swapEvaluator()
-        self.assertEqual(4, sut.evaluator(2,2))
+
     def testShouldBeableToComputeDivision(self):
         sut = self.sut
         sut.input("2/2")
@@ -212,6 +204,18 @@ class NodeFactoryTest(unittest.TestCase):
     def testSimpleNodeInBracketsShouldBeParsed(self):
         node = self.sut.input(" (5)")
         self.assertTrue(5, node.evaluate())
+    def testShouldBeAbleToSwapOperationsWithItsParent(self):
+        sut = Calculator.Node()
+        sut.input("3+2-2")
+        rvalue = sut.rnode
+        self.sut.swapEvaluator(rvalue)
+        self.assertEqual(0,sut.evaluator(2,2))        
+    def testShouldNotSwapEvaluatorIfRootNode(self):
+        sut = Calculator.Node()
+        node = sut.input("3+2")
+        self.sut.swapEvaluator(node)
+        self.assertEqual(4, sut.evaluator(2,2))
+        
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testShouldParseInput']
     unittest.main()
