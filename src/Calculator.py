@@ -129,8 +129,6 @@ class NodeFactory(object):
             node.operator_priority = self.operator_factory.getPriority(op)
             node.setLeftLeaf(self.input(s[:op_index]))
             self.parseRightNode(s[op_index+1 : ], node)
-            if node.isBranchSwapNecessary():
-                node.swapBranches()
         else:
             node.setLeftLeaf(self.input(s))        
         return node
@@ -138,4 +136,6 @@ class NodeFactory(object):
         node = Node()
         parent.setRightLeaf(node)
         self.parseNode(s, node)
+        if parent.isBranchSwapNecessary():
+            parent.swapBranches()        
         return node
