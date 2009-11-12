@@ -86,8 +86,7 @@ class NodeFactory(object):
             return Leaf(int(s))
     def parseCompositeNode(self, s):
         composite = CompositeNode()
-        node = Node()
-        composite.node = self.parseNode(s, node)
+        composite.node = self.parseNode(s, Node())
         return composite
     def parseNode(self, s, node):
         s = s.strip()
@@ -114,9 +113,13 @@ class NodeFactory(object):
     def isBranchSwapNecessary(self, node):
         if node.parent is None:
             return False
-        if node.parent.operator_priority <= node.operator_priority:
+        if not self.isParentsOperatorHigherPriority(node):
             return False
         return True
+    def isParentsOperatorHigherPriority(self, node):
+        if node.parent.operator_priority > node.operator_priority:
+            return True
+        return False
     def swapBranches(self, node):
         self.swapEvaluator(node)
         self.swapParentsLeaves(node)
