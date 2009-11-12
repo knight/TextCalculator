@@ -77,13 +77,8 @@ class NodeFactory(object):
     def __init__(self):
         self.operator_factory = OperatorFactory()
     def input(self, s):
-        s = s.strip()
-        if len(s)==0:
-            return Leaf(0)
-        if s[0]=="(":
-            return self.parseCompositeNode(s[1:string.rfind(s, ')')])
-        else:
-            return Leaf(int(s))
+        node = Node()
+        return self.parseNode(s, node)
     def parseCompositeNode(self, s):
         composite = CompositeNode()
         composite.node = self.parseNode(s, Node())
@@ -98,11 +93,19 @@ class NodeFactory(object):
         if op is not None:
             node.evaluator = self.operator_factory.getOperation(op)
             node.operator_priority = self.operator_factory.getPriority(op)
-            node.setLeftLeaf(self.input(s[:op_index]))
+            node.setLeftLeaf(self.parseLeftNode(s[:op_index]))
             self.parseRightNode(s[op_index+1 : ], node)
         else:
-            node.setLeftLeaf(self.input(s))        
+            node.setLeftLeaf(self.parseLeftNode(s))        
         return node
+    def parseLeftNode(self, s):
+        s = s.strip()
+        if len(s)==0:
+            return Leaf(0)
+        if s[0]=="(":
+            return self.parseCompositeNode(s[1:string.rfind(s, ')')])
+        else:
+            return Leaf(int(s))
     def parseRightNode(self, s, parent):
         node = Node()
         parent.setRightLeaf(node)
