@@ -28,10 +28,6 @@ class Node(object):
     def evaluate(self):
         return self.evaluator(self.lnode.evaluate(), self.rnode.evaluate())
 
-    def input(self, s):
-        node_factory = NodeFactory()
-        return node_factory.parseNode(s, self)
-
     def setLeftLeaf(self, node):
         self.lnode = node
         self.lnode.parent = self

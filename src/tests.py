@@ -1,13 +1,29 @@
 
 import unittest
 import Calculator
-
+class NodeProxy(Calculator.Node):
+    def __init__(self, factory, node):
+        Calculator.Node.__init__(self)
+        self.factory = factory
+        self.node = node
+        self.parent = None
+        self.node.operators = Calculator.OperatorFactory()
+        self.lnode = self.node.lnode
+        self.rnode = self.node.rnode
+    def fix(self):
+        self.lnode = self.node.lnode
+        self.rnode = self.node.rnode
+    def evaluate(self):
+        return self.node.evaluate()
+    def input(self, s):
+        self.node = self.factory.input(s)
+        self.fix()
+        return self.node
 class CalculatorTest(unittest.TestCase):
 
 
     def setUp(self):
-        self.sut = Calculator.Node()
-        self.sut.operators = Calculator.OperatorFactory()
+        self.sut = NodeProxy(Calculator.NodeFactory(), Calculator.Node())
 
     def tearDown(self):
         del self.sut
@@ -77,10 +93,11 @@ class CalculatorTest(unittest.TestCase):
     def testLeavesShouldHaveParentFieldInitialized(self):
         sut = self.sut
         lnode = self.sut.lnode
+        sut = sut.node
         self.assertEquals(sut, lnode.parent)
     def testOperationShouldImposeParentChildRelationship(self):
         sut = self.sut
-        sut.input("2*5")
+        sut = sut.input("2*5")
         lnode = sut.lnode
         self.assertEquals(sut, lnode.parent)
     def testOperationOnMultiDigit(self):
@@ -91,10 +108,11 @@ class CalculatorTest(unittest.TestCase):
         sut = self.sut
         sut.input("5")
         lnode = sut.lnode
+        sut = sut.node
         self.assertEquals(sut, lnode.parent)
     def testRightSideOfTheExpressionShouldAlsoHaveParentInitialized(self):
         sut = self.sut
-        sut.input("5+5")
+        sut = sut.input("5+5")
         rnode = sut.rnode
         self.assertEquals(sut, rnode.parent)
     def testCalulatorShouldBeAbleToSwapItsLeaves(self):
@@ -205,16 +223,16 @@ class NodeFactoryTest(unittest.TestCase):
         node = self.sut.input(" (5)")
         self.assertTrue(5, node.evaluate())
     def testShouldBeAbleToSwapOperationsWithItsParent(self):
-        sut = Calculator.Node()
-        sut.input("3+2-2")
+        sut = self.sut
+        sut = sut.input("3+2-2")
         rvalue = sut.rnode
         self.sut.swapEvaluator(rvalue)
         self.assertEqual(0,sut.evaluator(2,2))        
     def testShouldNotSwapEvaluatorIfRootNode(self):
-        sut = Calculator.Node()
+        sut = self.sut
         node = sut.input("3+2")
         self.sut.swapEvaluator(node)
-        self.assertEqual(4, sut.evaluator(2,2))
+        self.assertEqual(4, node.evaluator(2,2))
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testShouldParseInput']
